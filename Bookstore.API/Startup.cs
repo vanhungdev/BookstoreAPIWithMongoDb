@@ -1,25 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Bookstore.API.Middleware;
-using Bookstore.Application.Entities;
+using Bookstore.API.Infrastructure.Filters;
+using Bookstore.API.Infrastructure.Middleware;
+using Bookstore.Application.Book;
+using Bookstore.Application.Category;
 using Bookstore.Infrastructure.Configuration;
-using Bookstore.Infrastructure.Database;
+using Bookstore.Infrastructure.Entities;
 using Bookstore.Infrastructure.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 
 namespace Bookstore.API
 {
@@ -32,9 +26,19 @@ namespace Bookstore.API
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(op => op.Filters.Add(typeof(HttpGlobalExceptionFilter)))
-                .AddFluentValidation();
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                options.Filters.Add(typeof(ValidateModelStateFilter));
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            }).ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
             services.AddTransient<IValidator<Category>, categoryValidator>();
+            services.AddTransient<IValidator<Book>, BookValidator>();
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton(resolver => resolver.GetRequiredService<IOptionsMonitor<AppSettings>>().CurrentValue);
@@ -43,6 +47,10 @@ namespace Bookstore.API
                 Helper.Settings.ConnectionStringSettings.mongodbConnectString, 
                 Helper.Settings.ConnectionStringSettings.MongoDatabaseName, 
                 Helper.Settings.ConnectionStringSettings.CategoryCollectionName));
+            services.AddTransient(service => new BookMongoDb(
+                Helper.Settings.ConnectionStringSettings.mongodbConnectString,
+                Helper.Settings.ConnectionStringSettings.MongoDatabaseName,
+                Helper.Settings.ConnectionStringSettings.BookCollectionName));
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -52,7 +60,7 @@ namespace Bookstore.API
             }
             AppSettingServices.Services = app.ApplicationServices;
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
 
             app.UseAuthorization();

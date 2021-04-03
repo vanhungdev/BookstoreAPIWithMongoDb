@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bookstore.Application.Entities
+namespace Bookstore.Infrastructure.Entities
 {
     public abstract class Base
     {

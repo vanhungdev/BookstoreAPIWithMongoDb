@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bookstore.Application.Entities
+namespace Bookstore.Infrastructure.Entities
 {
     public class Category : Base
     {
@@ -27,8 +27,9 @@ namespace Bookstore.Application.Entities
     {
         public categoryValidator()
         {
-            RuleFor(x => x.Name).Length(0, 100);
-            RuleFor(x => x.Parentid).GreaterThan(-1);    
+            RuleFor(x => x.Name).Length(0, 255);
+            RuleFor(x => x.Parentid).GreaterThan(-1);
+            RuleFor(x => x.Orders).GreaterThan(0);
         }
     }
 }

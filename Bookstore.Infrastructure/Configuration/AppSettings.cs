@@ -16,6 +16,7 @@ namespace Bookstore.Infrastructure.Configuration
             public string mongodbConnectString { get; set; }
             public string MongoDatabaseName { get; set; }
             public string CategoryCollectionName { get; set; }
+            public string BookCollectionName { get; set; }
         }
        
     }

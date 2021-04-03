@@ -2,33 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bookstore.Application.Category;
 using Bookstore.Infrastructure.Entities;
-using Bookstore.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Bookstore.Application.Category;
-using Bookstore.Application.Book;
 
 namespace Bookstore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BooksController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly BookMongoDb _book;
-        public BooksController(BookMongoDb category)
+        private readonly CategoryMongoDb _category;
+        public CategoryController(CategoryMongoDb category)
         {
-            _book = category;
+            _category = category;
         }
         [HttpGet("GetAll")]
         public ActionResult getAllBook()
         {
-            return Ok(_book.get());
+            return Ok(_category.get());
         }
         [HttpGet("Get/{id}")]
-        public ActionResult<Book> Get(string id)
+        public ActionResult<Category> Get(string id)
         {
-            var data = _book.Get(id);
+            var data = _category.Get(id);
             if (data == null)
             {
                 return NotFound();
@@ -36,20 +34,20 @@ namespace Bookstore.API.Controllers
             return data;
         }
         [HttpPost("Create")]
-        public ActionResult Create([FromBody] Book book)
+        public ActionResult Create([FromBody] Category book)
         {
-            var result = _book.Create(book);
+            var result = _category.Create(book);
             return Ok("Create successfully");
         }
         [HttpPost("Edit/{id}")]
-        public IActionResult Update(string id, Book categoryin)
+        public IActionResult Update(string id, Category categoryin)
         {
-            var category = _book.Get(id);
+            var category = _category.Get(id);
             if (category == null)
             {
                 return NotFound();
             }
-            var data = _book.Update(id, categoryin);
+            var data = _category.Update(id, categoryin);
             if (!data)
             {
                 return Ok("Something is wrong ");
@@ -60,12 +58,12 @@ namespace Bookstore.API.Controllers
         [HttpDelete]
         public IActionResult Delete(string id)
         {
-            var book = _book.Get(id);
-            if (book == null)
+            var category = _category.Get(id);
+            if (category == null)
             {
                 return NotFound();
             }
-            var data = _book.Remove(book.Id);
+            var data = _category.Remove(category.Id);
             if (!data)
             {
                 return Ok("Something is wrong ");
