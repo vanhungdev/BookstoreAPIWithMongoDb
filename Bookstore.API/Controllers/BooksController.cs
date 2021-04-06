@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Bookstore.Application.Category;
 using Bookstore.Application.Book;
+using Bookstore.Infrastructure.Exceptions;
+using Bookstore.Infrastructure.Utilities;
+using Bookstore.Infrastructure.Enums;
 
 namespace Bookstore.API.Controllers
 {
@@ -20,6 +23,7 @@ namespace Bookstore.API.Controllers
         {
             _book = category;
         }
+
         [HttpGet("GetAll")]
         public ActionResult getAllBook()
         {

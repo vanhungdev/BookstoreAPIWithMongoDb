@@ -1,5 +1,6 @@
 ﻿
 using Bookstore.Infrastructure.Entities;
+using Bookstore.Infrastructure.Exceptions;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -19,39 +20,79 @@ namespace Bookstore.Infrastructure.Database
 
         }
 
-        public virtual List<T> get() => _data.Find(m => true).ToList();
+        public virtual List<T> get() 
+        {
+            try
+            {
+                return _data.Find(m => true).ToList();
+            }
+            catch(Exception e)
+            {
+                throw new CustomException(e.Message);
+            }        
+        } 
         public virtual T Get(string id)
         {
             try
             {
                 return _data.Find<T>(m => m.Id == id).FirstOrDefault();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw;
-            }
-                
+                throw new CustomException(e.Message);
+            }                
         }
 
         public virtual T Create(T model)
         {
-            _data.InsertOne(model);
-            return model;
+            try
+            {
+                _data.InsertOne(model);
+                return model;
+            }
+            catch (Exception e)
+            {
+                throw new CustomException(e.Message);
+            }          
         }
 
         public virtual bool Update(string id, T model)
         {
-            var result = _data.ReplaceOne(m => m.Id == id, model);
-            return result.ModifiedCount > 0;
+            try
+            {
+                var result = _data.ReplaceOne(m => m.Id == id, model);
+                return result.ModifiedCount > 0;
+            }
+            catch (Exception e)
+            {
+                throw new CustomException(e.Message);
+            }      
         }
-            
-        public virtual void Remove(T model) =>
-            _data.DeleteOne(m => m.Id == model.Id);
+
+        public virtual void Remove(T model) {
+            try
+            {
+                _data.DeleteOne(m => m.Id == model.Id);
+            }
+            catch (Exception e)
+            {
+                throw new CustomException(e.Message);
+            }
+        }
+       
 
         public virtual bool Remove(string id)
         {
-            var result = _data.DeleteOne(m => m.Id == id);
-            return result.DeletedCount > 0;
+            try
+            {
+                var result = _data.DeleteOne(m => m.Id == id);
+                return result.DeletedCount > 0;
+            }
+            catch (Exception e)
+            {
+                throw new CustomException(e.Message);
+            }
+            
         }
             
     }

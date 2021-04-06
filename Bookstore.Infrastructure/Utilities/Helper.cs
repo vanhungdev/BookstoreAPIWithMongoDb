@@ -18,7 +18,6 @@ namespace Bookstore.Infrastructure.Utilities
         {
             var log = new StringBuilder();
             log.AppendLine(string.Concat($"Before call api url: {url}", Environment.NewLine, $"input: {JsonConvert.SerializeObject(objReq)}"));
-
             T result = null;
             try
             {
